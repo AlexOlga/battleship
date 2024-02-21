@@ -7,19 +7,20 @@ const isPlayerExis=(player:TPlayer)=>{
     return !!Players.find((pl) => pl.name === name );
 }
 
-export const regPlayer = (ws: WebSocket, player: TPlayer) => {   
+export const regPlayer = (ws: WebSocket,index:number, player: TPlayer) => {   
     let data;
+    console.log('p2', player)
     if (!isPlayerExis(player)) {
         Players.push(player);
         data = {
             name:  player.name,
-            index: Players.length-1,
+            index: index,
             error: false,
             errorText: '',
         }
     } else {
         data = {
-            name:  player.name,
+            name:  '',
             index: -1,
             error: true,
             errorText: 'a player with the same name already exists',
