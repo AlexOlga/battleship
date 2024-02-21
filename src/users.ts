@@ -2,16 +2,34 @@ import  WebSocket from 'ws';
 import { Players } from "./data";
 import { TPlayer } from "./type";
 
-export const regPlayer = (ws: WebSocket, user: TPlayer) => {   
-    Players.push(user);
+const isPlayerExis=(player:TPlayer)=>{
+    const {name}=player
+    return !!Players.find((pl) => pl.name === name );
+}
+
+export const regPlayer = (ws: WebSocket, player: TPlayer) => {   
+    let data;
+    if (!isPlayerExis(player)) {
+        Players.push(player);
+        data = {
+            name:  player.name,
+            index: Players.length-1,
+            error: false,
+            errorText: '',
+        }
+    } else {
+        data = {
+            name:  player.name,
+            index: -1,
+            error: true,
+            errorText: 'a player with the same name already exists',
+        }
+
+    }
+   
     const response = {
         type: 'reg',
-        data: JSON.stringify({
-          name:  user.name,
-          index: Players.length-1,
-          error: false,
-          errorText: '',
-        }),
+        data: JSON.stringify(data),
         id: 0,
       };
     
