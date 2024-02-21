@@ -1,5 +1,6 @@
 import  WebSocket, { WebSocketServer } from 'ws';
 import { TRequest } from '../type';
+import { regPlayer } from '../users';
 
 const WSPORT = 3000;
 
@@ -10,7 +11,7 @@ export const wsServer = new WebSocketServer({
 export const handleRequest = (ws: WebSocket, req: TRequest) => {
   switch (req.type) {
     case 'reg':
-      // regPlayer(ws, req.data);
+      regPlayer(ws, req.data);
       break;
     case 'create_room':
       // createRoom(ws, req.data);
