@@ -1,5 +1,5 @@
 import { httpServer } from './src/http_server/index';
-import {wsServer} from './src/ws-server/index';
+import {wsServer,  handleRequest} from './src/ws-server/index';
 import  WebSocket from 'ws';
 
 import dotenv from 'dotenv';
@@ -16,6 +16,7 @@ wsServer.on('connection', (ws: WebSocket) => {
     ws.on('message', (message: string) => {
       const request = JSON.parse(message);
       console.log(request);
+      handleRequest (ws, request);
       
     });
   
