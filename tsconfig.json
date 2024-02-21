@@ -1,32 +1,18 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "target": "ESNext",
-    "lib": ["esnext"],
-    "rootDir": ".",
-    "baseUrl": "./",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
-    "moduleResolution": "node",
-    "noEmit": true
+    "target": "es2016",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    "experimentalDecorators": true,                   /* Enable experimental support for TC39 stage 2 draft decorators. */
+    "emitDecoratorMetadata": true,                    /* Emit design-type metadata for decorated declarations in source files. */
+    "module": "ES6",                                /* Specify what module code is generated. */
+     "moduleResolution": "node",                       /* Specify how TypeScript looks up a file from a given module specifier. */
+     "outDir": "./dist",                                   /* Specify an output folder for all emitted files. */
+     "removeComments": true,                           /* Disable emitting comments. */
+    "strict": true,                                      /* Enable all strict type-checking options. */
+    "skipLibCheck": true,                               /* Skip type checking all .d.ts files. */
+    "allowSyntheticDefaultImports": true
   },
-  "watch": true,
   "ts-node": {
-    "transpileOnly": true,
-    "files": true,
     "esm": true,
-    "compilerOptions": {
-      "module": "ESNext"
-    }
-  },
-  "exclude": ["node_modules"]
+    "experimentalSpecifierResolution": "node",
+  }
 }
