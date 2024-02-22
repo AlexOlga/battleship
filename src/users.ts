@@ -11,6 +11,7 @@ export const regPlayer = (ws: WebSocket,index:number, player: TPlayer) => {
     let data;
     console.log('p2', player)
     if (!isPlayerExis(player)) {
+        player.id = index;
         Players.push(player);
         data = {
             name:  player.name,

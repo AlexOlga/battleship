@@ -1,8 +1,7 @@
-import  WebSocket, { WebSocketServer } from 'ws';
+import WebSocket, { WebSocketServer } from 'ws';
 import { TRequest } from '../type';
 import { regPlayer } from '../users';
-import { createRoom, updateRoom} from '../rooms';
-import { Players } from '../data';
+import { addUseerRoom, createRoom, updateRoom } from '../rooms';
 
 const WSPORT = 3000;
 
@@ -10,19 +9,19 @@ export const wsServer = new WebSocketServer({
   port: WSPORT,
 });
 
-export const handleRequest = (ws: WebSocket, index:number, req: TRequest) => {
+export const handleRequest = (ws: WebSocket, index: number, req: TRequest) => {
   switch (req.type) {
-    case 'reg':  
-    const player=JSON.parse(req.data);  
-      regPlayer(ws, index, player );
-      console.log(' Players', Players)
+    case 'reg':
+      const player = JSON.parse(req.data);
+      regPlayer(ws, index, player);      
       break;
     case 'create_room':
-      createRoom(); 
-     updateRoom();
+      createRoom();
+      updateRoom();
       break;
     case 'add_user_to_room':
-      // addUseerRoom(ws, req.data);
+      addUseerRoom(index, req.data);
+      updateRoom();
       break;
     case 'add_ships':
       // addShips(ws, req.data);
