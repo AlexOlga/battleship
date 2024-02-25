@@ -25,7 +25,12 @@ wsServer.on('connection', (ws: WebSocket) => {
 
     });
 
-    ws.on('close', () => {
-        console.log('Connection interrupted');
-    });
+    process.on('SIGINT', () => {       
+        for (const key in PlayersWs) {
+            PlayersWs[key].close();
+        }     
+        console.log('Connection interrupted');  
+            process.exit();
+        })
+    
 });

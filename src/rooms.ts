@@ -11,8 +11,9 @@ export const createRoom = () => {
 
 }
 export const getResponseUpdateRooms = () => {
-    const data = Rooms.map((r) => {
-        if (r.roomUsers.length < 2) return r
+    const data:TRooms[] =[]
+    Rooms.forEach((r) => {
+        if (r.roomUsers && r.roomUsers.length < 2) data.push(r)
     })
     
     const response =
@@ -24,13 +25,14 @@ export const getResponseUpdateRooms = () => {
     return response
 }
 export const updateRoom = () => {
-    const response = getResponseUpdateRooms()
+    const response = getResponseUpdateRooms();
     for (const key in PlayersWs) {
         PlayersWs[key].send(JSON.stringify(response));
     }
 }
 
 const isUserinRoom = (room: TRooms, player: TPlayer) => {
+    if (room.roomUsers.length === 0 ) return false; //
     return !!room.roomUsers.find((us) => us.index === player.id);
 }
 

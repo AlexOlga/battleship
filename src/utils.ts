@@ -1,4 +1,6 @@
 import crypto from 'crypto';
+import { PlayersWs } from './data';
+import { TRequest } from './type';
 
 
 export const generateUniqueId = () => {
@@ -6,3 +8,10 @@ export const generateUniqueId = () => {
     return parseInt(id, 16);
 }
 
+
+export const sendALL = (response: TRequest ) => {
+    for (const key in PlayersWs) {
+        PlayersWs[key].send(JSON.stringify(response));
+    }
+
+}

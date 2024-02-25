@@ -2,7 +2,8 @@ import WebSocket from 'ws';
 import { Games, PlayersWs } from './data';
 import { KILLED, MISS, SHOT, TAttack, TGame, TPosition, TPships, TRooms, TShip } from './type';
 import { generateUniqueId } from './utils';
-import { updatePlayer } from './users';
+import { updatePlayer, updateWinners } from './users';
+import { updateRoom } from './rooms';
 
 export const createGame = (room: TRooms) => {
   const idGame = generateUniqueId();
@@ -94,9 +95,11 @@ export const attack = (ws: WebSocket, req: string) => {
       sendTurn(data.indexPlayer, game.players);
     }
     //проверяем игру на победу
-    if ((st === KILLED) && isWin(player)) {
-       sendWin(player.indexPlayer, game.players);
-       updatePlayer(player.indexPlayer)
+    if (st === KILLED && isWin(player)) {
+      sendWin(data.indexPlayer, game.players);
+      updatePlayer(data.indexPlayer);
+      updateWinners();
+      updateRoom(); 
     }
   }
 };
@@ -106,13 +109,11 @@ const getResultAttack = (ships: TShip[], x: number, y: number) => {
     if (ships[i].direction) {
       if (isShortV(ships[i].position, ships[i].length, { x, y })) {
         // short in ship[i]
-        // return changeStatusShip( ships[i].position.y, y, ships[i].status);
         return changeStatusShip(ships[i], { x, y });
       }
     } else {
       if (isShortH(ships[i].position, ships[i].length, { x, y })) {
         // short in ship[i]
-        //return changeStatusShip(ships[i].position.x, x, ships[i].status);
         return changeStatusShip(ships[i], { x, y });
       }
     }
@@ -127,12 +128,7 @@ const isShortH = (shipP: TPosition, shipL: number, attackP: TPosition) => {
 const isShortV = (shipP: TPosition, shipL: number, attackP: TPosition) => {
   return attackP.y >= shipP.y && attackP.y < shipP.y + shipL && attackP.x === shipP.x;
 };
-/*const changeStatusShip = (shipP: number, attackP: number, status: boolean[] | undefined) => {
-  if (!status) return;
-  status[attackP - shipP] = true;
 
-  return isKilled(status) ? KILLED : SHOT;
-};*/
 const changeStatusShip = (ships: TShip, attack: TPosition) => {
   const { status, direction, position } = ships;
   if (!status) return;
@@ -171,26 +167,32 @@ const sendTurn = (id: number, players: TPships[]) => {
 
 const isWin = (player: TPships) => {
   let win = false;
-  const {ships} = player;
+  const { ships } = player;
   let i = 0;
   while (!win && i < ships.length) {
-    if (ships[i].isLive) win = true;   
+    if (ships[i].isLive) win = true;
     i++;
   }
-return !win
-
+  return !win;
 };
 
-const sendWin = (winPlayerId:number, players: TPships[]) =>{
-    const data = {
-        winPlayer: winPlayerId,
-      };
-      const response = {
-        type: "finish",
-        data:JSON.stringify(data),            
-        id: 0,
-    }
-    players.forEach((p) => {
-        PlayersWs[p.indexPlayer].send(JSON.stringify(response));
-      });
+const sendWin = (winPlayerId: number, players: TPships[]) => {
+  const data = {
+    winPlayer: winPlayerId,
+  };
+  const response = {
+    type: 'finish',
+    data: JSON.stringify(data),
+    id: 0,
+  };
+  players.forEach((p) => {
+    PlayersWs[p.indexPlayer].send(JSON.stringify(response));
+  });
+};
+
+
+export const randomAttack = () =>{
+
 }
+
+/* */
