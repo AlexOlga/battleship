@@ -18,7 +18,7 @@ export type TPlayerInRoom = {
 
 export type TRooms = {
   roomId: number;
-  roomUsers: TPlayerInRoom[];
+  roomUsers: TPlayerInRoom[];  
 };
 
 export type TPlayersWs = {
@@ -45,6 +45,7 @@ export type TGame = {
   idGame: number;
   room: TRooms;
   players?: TPships[];
+  currentUser?: number;
 };
 export type TGames = {
   [key: number]: TGame;

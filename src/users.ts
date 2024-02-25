@@ -8,7 +8,7 @@ const isPlayerExis=(player:TPlayer)=>{
     return !!Players.find((pl) => pl.name === name );
 }
 
-export const regPlayer = (ws: WebSocket,index:number, player: TPlayer) => {   
+export const regPlayer = (ws: WebSocket, index:number, player: TPlayer) => {   
     let data;  
     if (!isPlayerExis(player)) {
         player.id = index;

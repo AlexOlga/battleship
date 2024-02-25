@@ -32,8 +32,9 @@ export const addShips = (req: string) => {
     game.players[1] = data;
   }
   if (game.players.length === 2) {
+    game.currentUser=game.players[0].indexPlayer;
     startGame(game);
-    sendTurn(game.players[0].indexPlayer, game.players);
+    sendTurn(game.currentUser, game.players);
   }
 };
 
@@ -61,11 +62,14 @@ const startGame = (game: TGame) => {
 
 export const attack = (req: string) => {
   const data = JSON.parse(req) as TAttack;
-  const game = Games[data.gameId];
+  const game = Games[data.gameId];  
+
   if (!game) {
     console.error('Game with this ID was not found');
     return;
   }
+  // выстрел не в свой ход
+  if (game.currentUser !== data.indexPlayer) return;
 
   const player = game.players?.find((p) => p.indexPlayer !== data.indexPlayer);
   if (player?.ships) {
@@ -89,8 +93,10 @@ export const attack = (req: string) => {
     if (!game.players) return;
     // определяем чей ход
     if (st === MISS) {
+        game.currentUser = player.indexPlayer;
       sendTurn(player.indexPlayer, game.players);
     } else {
+        game.currentUser = data.indexPlayer;
       sendTurn(data.indexPlayer, game.players);
     }
     //проверяем игру на победу
