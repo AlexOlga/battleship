@@ -14,7 +14,7 @@ export const getResponseUpdateRooms = () => {
     const data = Rooms.map((r) => {
         if (r.roomUsers.length < 2) return r
     })
-    console.log('data room', data);
+    
     const response =
     {
         type: "update_room",
@@ -35,10 +35,8 @@ const isUserinRoom = (room: TRooms, player: TPlayer) => {
 }
 
 export const addUseerRoom = (id: number, data: string) => {
-    const { indexRoom } = JSON.parse(data)
-    console.log('indexRoom', indexRoom)
+    const { indexRoom } = JSON.parse(data)   
     const room = Rooms.find(r => r.roomId === indexRoom);
-    console.log('room', room);
     const player = Players.find(p => p.id === id);
 
     if (room && player && !isUserinRoom(room, player)) {
