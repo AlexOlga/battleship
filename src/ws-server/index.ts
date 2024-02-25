@@ -2,7 +2,7 @@ import WebSocket, { WebSocketServer } from 'ws';
 import { TRequest } from '../type';
 import { regPlayer } from '../users';
 import { addUseerRoom, createRoom, getResponseUpdateRooms, updateRoom } from '../rooms';
-import { addShips, attack } from '../game';
+import { addShips, attack, randomAttack } from '../game';
 
 const WSPORT = 3000;
 
@@ -28,13 +28,13 @@ export const handleRequest = (ws: WebSocket, index: number, req: TRequest) => {
       updateRoom();
       break;
     case 'add_ships':
-      addShips( req.data);
+      addShips(req.data);
       break;
     case 'attack':
-      attack(ws, req.data);
+      attack(req.data);
       break;
     case 'randomAttack':
-      // randomAttack(ws, req.data);
+      randomAttack(req.data);
       break;
   }
 };

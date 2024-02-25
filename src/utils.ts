@@ -15,3 +15,7 @@ export const sendALL = (response: TRequest ) => {
     }
 
 }
+
+export const randomNumber = () => {
+    return Math.floor(Math.random() * 10);
+}

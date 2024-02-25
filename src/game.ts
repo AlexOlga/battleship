@@ -1,7 +1,6 @@
-import WebSocket from 'ws';
 import { Games, PlayersWs } from './data';
 import { KILLED, MISS, SHOT, TAttack, TGame, TPosition, TPships, TRooms, TShip } from './type';
-import { generateUniqueId } from './utils';
+import { generateUniqueId, randomNumber } from './utils';
 import { updatePlayer, updateWinners } from './users';
 import { updateRoom } from './rooms';
 
@@ -60,7 +59,7 @@ const startGame = (game: TGame) => {
   });
 };
 
-export const attack = (ws: WebSocket, req: string) => {
+export const attack = (req: string) => {
   const data = JSON.parse(req) as TAttack;
   const game = Games[data.gameId];
   if (!game) {
@@ -99,7 +98,7 @@ export const attack = (ws: WebSocket, req: string) => {
       sendWin(data.indexPlayer, game.players);
       updatePlayer(data.indexPlayer);
       updateWinners();
-      updateRoom(); 
+      updateRoom();
     }
   }
 };
@@ -189,10 +188,14 @@ const sendWin = (winPlayerId: number, players: TPships[]) => {
     PlayersWs[p.indexPlayer].send(JSON.stringify(response));
   });
 };
+export const randomAttack = (req: string) => {
+  const data = JSON.parse(req);
 
-
-export const randomAttack = () =>{
-
-}
-
-/* */
+  const newData = {
+    gameId: data.gameId,
+    x: randomNumber(),
+    y: randomNumber(),
+    indexPlayer: data.indexPlayer,
+  };
+  attack(JSON.stringify(newData));
+};
