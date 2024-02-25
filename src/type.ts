@@ -9,6 +9,7 @@ export type TPlayer = {
   id?: number;
   name: string;
   password: string;
+  wins: number;
 };
 export type TPlayerInRoom = {
   name: string;
@@ -33,6 +34,7 @@ export type TShip = {
   length: number;
   type: 'small' | 'medium' | 'large' | 'huge';
   status?:boolean[];
+  isLive?: boolean;
 };
 export type TPships = {
   indexPlayer: number;

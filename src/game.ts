@@ -2,6 +2,7 @@ import WebSocket from 'ws';
 import { Games, PlayersWs } from './data';
 import { KILLED, MISS, SHOT, TAttack, TGame, TPosition, TPships, TRooms, TShip } from './type';
 import { generateUniqueId } from './utils';
+import { updatePlayer } from './users';
 
 export const createGame = (room: TRooms) => {
   const idGame = generateUniqueId();
@@ -53,6 +54,7 @@ const startGame = (game: TGame) => {
     ws.send(JSON.stringify(response));
     p.ships.forEach((sh) => {
       sh.status = Array(sh.length).fill(false);
+      sh.isLive = true;
     });
   });
 };
@@ -65,8 +67,7 @@ export const attack = (ws: WebSocket, req: string) => {
     return;
   }
 
- const player = game.players?.find((p) => p.indexPlayer !== data.indexPlayer);
- //const player = game.players?.find((p) => p.indexPlayer === data.indexPlayer);
+  const player = game.players?.find((p) => p.indexPlayer !== data.indexPlayer);
   if (player?.ships) {
     const st = getResultAttack(player?.ships, data.x, data.y);
     const resData = {
@@ -86,10 +87,16 @@ export const attack = (ws: WebSocket, req: string) => {
       PlayersWs[p.indexPlayer].send(JSON.stringify(response));
     });
     if (!game.players) return;
+    // определяем чей ход
     if (st === MISS) {
       sendTurn(player.indexPlayer, game.players);
     } else {
       sendTurn(data.indexPlayer, game.players);
+    }
+    //проверяем игру на победу
+    if ((st === KILLED) && isWin(player)) {
+       sendWin(player.indexPlayer, game.players);
+       updatePlayer(player.indexPlayer)
     }
   }
 };
@@ -99,12 +106,14 @@ const getResultAttack = (ships: TShip[], x: number, y: number) => {
     if (ships[i].direction) {
       if (isShortV(ships[i].position, ships[i].length, { x, y })) {
         // short in ship[i]
-        return changeStatusShip(ships[i].position.y, y, ships[i].status);
+        // return changeStatusShip( ships[i].position.y, y, ships[i].status);
+        return changeStatusShip(ships[i], { x, y });
       }
     } else {
       if (isShortH(ships[i].position, ships[i].length, { x, y })) {
         // short in ship[i]
-        return changeStatusShip(ships[i].position.x, x, ships[i].status);
+        //return changeStatusShip(ships[i].position.x, x, ships[i].status);
+        return changeStatusShip(ships[i], { x, y });
       }
     }
   }
@@ -118,10 +127,22 @@ const isShortH = (shipP: TPosition, shipL: number, attackP: TPosition) => {
 const isShortV = (shipP: TPosition, shipL: number, attackP: TPosition) => {
   return attackP.y >= shipP.y && attackP.y < shipP.y + shipL && attackP.x === shipP.x;
 };
-const changeStatusShip = (shipP: number, attackP: number, status: boolean[] | undefined) => {
+/*const changeStatusShip = (shipP: number, attackP: number, status: boolean[] | undefined) => {
   if (!status) return;
   status[attackP - shipP] = true;
+
   return isKilled(status) ? KILLED : SHOT;
+};*/
+const changeStatusShip = (ships: TShip, attack: TPosition) => {
+  const { status, direction, position } = ships;
+  if (!status) return;
+
+  const attackP = direction ? attack.y : attack.x;
+  const shipP = direction ? position.y : position.x;
+  status[attackP - shipP] = true;
+  const kill = isKilled(status);
+  if (kill) ships.isLive = false;
+  return kill ? KILLED : SHOT;
 };
 
 const isKilled = (status: boolean[]) => {
@@ -131,7 +152,6 @@ const isKilled = (status: boolean[]) => {
     kill = status[i];
     i++;
   }
-
   return kill;
 };
 
@@ -149,30 +169,28 @@ const sendTurn = (id: number, players: TPships[]) => {
   });
 };
 
-/*
-    position: { x: 1, y: 5 },
-    direction: true,
-    type: 'large',
-    length: 3,
-    status: [ true, true, true ]
-  },
+const isWin = (player: TPships) => {
+  let win = false;
+  const {ships} = player;
+  let i = 0;
+  while (!win && i < ships.length) {
+    if (ships[i].isLive) win = true;   
+    i++;
+  }
+return !win
 
-*/
-/*
-false -->
-true |
+};
 
-true|true| true| -- yes ship
-
-
-{
-  type: 'attack',
-  data: '{"x":2,"y":1,"gameId":9845403983585956000,"indexPlayer":216205914456715200}',
-  id: 0
+const sendWin = (winPlayerId:number, players: TPships[]) =>{
+    const data = {
+        winPlayer: winPlayerId,
+      };
+      const response = {
+        type: "finish",
+        data:JSON.stringify(data),            
+        id: 0,
+    }
+    players.forEach((p) => {
+        PlayersWs[p.indexPlayer].send(JSON.stringify(response));
+      });
 }
- if (
-      x >= ship.position.x &&
-      x < ship.position.x + ship.length &&
-      y === ship.position.y
-    ) {
-*/

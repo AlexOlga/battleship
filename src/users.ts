@@ -8,10 +8,10 @@ const isPlayerExis=(player:TPlayer)=>{
 }
 
 export const regPlayer = (ws: WebSocket,index:number, player: TPlayer) => {   
-    let data;
-    console.log('p2', player)
+    let data;  
     if (!isPlayerExis(player)) {
         player.id = index;
+        player.wins = 0;
         Players.push(player);
         data = {
             name:  player.name,
@@ -37,3 +37,9 @@ export const regPlayer = (ws: WebSocket,index:number, player: TPlayer) => {
     
       ws.send(JSON.stringify(response));
     }
+
+
+  export const  updatePlayer = (id: number) =>{
+   const player = Players.find((pl) => pl.id === id );
+   if (player) player.wins ++
+  }
